@@ -107,8 +107,7 @@
                         <p class="text-emerald-100 font-bold text-sm mb-2 flex items-center gap-1">
                             <span>📜</span> 「英文,中文」或「中文,英文」
                         </p>
-                        <textarea id="word-input" class="w-full h-48 p-4 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl text-amber-50 text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300/60 font-mono custom-scrollbar" placeholder="「英文,中文」或「中文,英文」">
-蘋果,apple
+                        <textarea id="word-input" class="w-full h-48 p-4 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl text-amber-50 text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300/60 font-mono custom-scrollbar" placeholder="一行一個單字，支援 英文,中文 或 中文,英文">蘋果,apple
 香蕉,banana</textarea>
                     </div>
                 </div>
@@ -158,7 +157,7 @@
                 <!-- 模式選擇區 -->
                 <div id="mode-selection-section" class="ghibli-card rounded-3xl p-6 md:p-8 text-center">
                     <h2 class="text-2xl font-black text-emerald-950 flex items-center justify-center gap-2">
-                        <span>✨</span> 選擇遊戲模式✨
+                        <span>✨</span> 選擇練習模式
                     </h2>
 
                     <div class="mt-6 space-y-3">
@@ -209,14 +208,6 @@
                             <span id="spelling-input-text"></span><span id="spelling-cursor" class="h-6 md:h-8"></span>
                         </div>
                         <div id="alphabet-keyboard" class="w-full mt-2 p-1 flex justify-center items-center flex-wrap gap-1"></div>
-                        <div class="mt-3 flex justify-center items-center gap-3">
-                            <button id="speech-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
-                                ⬅️ 上一個
-                            </button>
-                            <button id="speech-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
-                                下一個 ➡️
-                            </button>
-                        </div>
                     </div>
 
                     <!-- 字母重組模式 -->
@@ -283,16 +274,26 @@
                     </div>
                 </div>
 
-                <button id="check-answer-btn" class="mt-3 ghibli-btn bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base md:text-lg py-2 px-8 rounded-xl shadow-md border border-emerald-500">
+                <button id="check-answer-btn" class="mt-6 ghibli-btn bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs md:text-sm py-1.5 px-5 rounded-xl shadow-md border border-emerald-500">
                     檢查答案
                 </button>
 
-                <!-- 猜中文模式 上一個 / 下一個 按鈕區塊 -->
-                <div id="flashcard-nav-container" class="hidden mt-2 flex justify-center items-center gap-3">
-                    <button id="flashcard-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
+                <!-- 拼單字模式 上一個 / 下一個 按鈕區塊 -->
+                <div id="spelling-nav-container" class="hidden mt-3 flex justify-center items-center gap-3">
+                    <button id="spelling-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
                         ⬅️ 上一個
                     </button>
-                    <button id="flashcard-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
+                    <button id="spelling-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
+                        下一個 ➡️
+                    </button>
+                </div>
+
+                <!-- 猜中文模式 上一個 / 下一個 按鈕區塊 -->
+                <div id="flashcard-nav-container" class="hidden mt-6 flex justify-center items-center gap-3">
+                    <button id="flashcard-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-5 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
+                        ⬅️ 上一個
+                    </button>
+                    <button id="flashcard-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-5 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
                         下一個 ➡️
                     </button>
                 </div>
@@ -304,6 +305,9 @@
         </div>
     </div>
 
+    <!-- Author Tag -->
+    <p class="fixed bottom-4 right-4 bg-white/80 backdrop-blur-md py-1.5 px-4 rounded-full border border-emerald-200/80 text-xs font-semibold text-emerald-900 shadow-md z-50 flex items-center gap-1">
+        <span>🌱</span> Made by 阿剛老師
     </p>
 
     <script>
@@ -318,7 +322,7 @@
         const checkAnswerBtn = $('check-answer-btn'), speakEmojiBtn = $('speak-emoji-btn'), backToMainBtn = $('back-to-main-button'), feedbackIndicator = $('feedback-indicator');
 
         // Modes
-        const spellingModeDiv = $('spelling-mode'), spellingAnswer = $('spelling-answer'), spellingInputText = $('spelling-input-text'), alphabetKeyboard = $('alphabet-keyboard');
+        const spellingModeDiv = $('spelling-mode'), spellingAnswer = $('spelling-answer'), spellingInputText = $('spelling-input-text'), alphabetKeyboard = $('alphabet-keyboard'), spellingNavContainer = $('spelling-nav-container'), spellingPrevBtn = $('spelling-prev-btn'), spellingNextBtn = $('spelling-next-btn');
         const jumbleModeDiv = $('jumble-mode'), jumbleAnswer = $('jumble-answer'), jumblePool = $('jumble-pool'), jumbleCapsBtn = $('jumble-caps-btn'), jumbleClearBtn = $('jumble-clear-btn');
         const speechModeDiv = $('speech-mode'), toggleSpeechEnglishBtn = $('toggle-speech-english-btn'), recordBtn = $('record-btn'), recognitionStatus = $('recognition-status'), recognizedText = $('recognized-text'), speechPrevBtn = $('speech-prev-btn'), speechNextBtn = $('speech-next-btn');
         const flashcardNavContainer = $('flashcard-nav-container'), flashcardPrevBtn = $('flashcard-prev-btn'), flashcardNextBtn = $('flashcard-next-btn');
@@ -534,7 +538,7 @@
             if (recognition && isRecording) { try { recognition.stop(); } catch(e){} }
 
             chineseWord.textContent = currentMode === 'flashcard_en2zh' ? cur.english : cur.chinese;
-            chineseWord.className = currentMode === 'flashcard_en2zh' ? 'drop-shadow-sm font-times text-blue-900 font-black' : 'drop-shadow-sm';
+            chineseWord.className = currentMode === 'flashcard_en2zh' ? 'drop-shadow-sm font-times text-blue-900 font-black text-4xl md:text-6xl' : 'drop-shadow-sm';
             
             englishWord.textContent = currentMode === 'flashcard_en2zh' ? cur.chinese : cur.english;
             englishWord.className = currentMode === 'flashcard_en2zh' 
@@ -550,6 +554,8 @@
             if (currentMode === 'spelling') {
                 spellingInputText.innerHTML = '';
                 alphabetKeyboard.classList.remove('opacity-50', 'pointer-events-none');
+                if (spellingPrevBtn) spellingPrevBtn.disabled = (currentWordIndex === 0);
+                if (spellingNextBtn) spellingNextBtn.disabled = (currentWordIndex === activeWords.length - 1);
             } else if (currentMode === 'flashcard_en2zh') {
                 if (flashcardPrevBtn) flashcardPrevBtn.disabled = (currentWordIndex === 0);
                 if (flashcardNextBtn) flashcardNextBtn.disabled = (currentWordIndex === activeWords.length - 1);
@@ -623,7 +629,22 @@
             if (isCorrect) {
                 englishWordContainer.classList.remove('hidden');
                 checkAnswerBtn.disabled = true;
-                if (currentMode === 'spelling') alphabetKeyboard.classList.add('opacity-50', 'pointer-events-none');
+                if (currentMode === 'spelling') {
+                    alphabetKeyboard.classList.add('opacity-50', 'pointer-events-none');
+                    // 拼單字答對後自動切換下一題
+                    setTimeout(() => {
+                        if (currentWordIndex < activeWords.length - 1) {
+                            currentWordIndex++;
+                            displayWord();
+                        } else {
+                            feedbackIndicator.textContent = '🏆';
+                            setTimeout(() => {
+                                alert('🎉 恭喜！您已完成所有單字的拼字練習！');
+                                showSection('main');
+                            }, 300);
+                        }
+                    }, 800);
+                }
             } else if (currentMode === 'spelling') {
                 spellingAnswer.classList.add('animate-shake');
                 setTimeout(() => spellingAnswer.classList.remove('animate-shake'), 500);
@@ -649,9 +670,10 @@
         }
 
         function handleRecognitionResult(transcript) {
-            recognizedText.textContent = `「${transcript}」`;
+            const lowerTranscript = transcript.toLowerCase();
+            recognizedText.textContent = `「${lowerTranscript}」`;
             const clean = s => s.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
-            const isCorrect = clean(transcript) === clean(activeWords[currentWordIndex].english);
+            const isCorrect = clean(lowerTranscript) === clean(activeWords[currentWordIndex].english);
 
             playSound(isCorrect ? 'correct' : 'incorrect');
             feedbackIndicator.textContent = isCorrect ? '🌸' : '🍂';
@@ -694,7 +716,7 @@
 
                 if (typingRemainingSeconds <= 0) {
                     clearInterval(typingTimerInterval); typingTimerInterval = null; typingInput.disabled = true;
-                    alert(`⏱️ 時間到！\n打字速度：${typingWpmDisplay.textContent} WPM\n正確率：${typingAccuracyDisplay.textContent}`);
+                    alert(`⏱️ 時間到！\n打字速度：${typingWpmDisplay.textContent} 字/分\n正確率：${typingAccuracyDisplay.textContent}`);
                 }
             }, 1000);
         }
@@ -771,7 +793,7 @@
             } else {
                 clearInterval(typingTimerInterval);
                 feedbackIndicator.textContent = '🏆';
-                alert(`🎉 恭喜完成！\n打字速度：${typingWpmDisplay.textContent} WPM\n正確率：${typingAccuracyDisplay.textContent}`);
+                alert(`🎉 恭喜完成！\n打字速度：${typingWpmDisplay.textContent} 字/分\n正確率：${typingAccuracyDisplay.textContent}`);
                 showSection('main');
             }
         }
@@ -795,8 +817,12 @@
                 }
             }
 
-            [spellingModeDiv, jumbleModeDiv, speechModeDiv, typingModeDiv, checkAnswerBtn, flashcardNavContainer].forEach(el => el.classList.add('hidden'));
-            if (mode === 'spelling') { spellingModeDiv.classList.remove('hidden'); checkAnswerBtn.classList.remove('hidden'); }
+            [spellingModeDiv, jumbleModeDiv, speechModeDiv, typingModeDiv, checkAnswerBtn, flashcardNavContainer, spellingNavContainer].forEach(el => el && el.classList.add('hidden'));
+            if (mode === 'spelling') { 
+                spellingModeDiv.classList.remove('hidden'); 
+                checkAnswerBtn.classList.remove('hidden'); 
+                if (spellingNavContainer) spellingNavContainer.classList.remove('hidden'); 
+            }
             else if (mode === 'jumble') { jumbleModeDiv.classList.remove('hidden'); }
             else if (mode === 'speech') { speechModeDiv.classList.remove('hidden'); }
             else if (mode === 'typing') { typingModeDiv.classList.remove('hidden'); resetTypingStats(); }
@@ -820,6 +846,9 @@
         toggleSpeechEnglishBtn.addEventListener('click', () => { hideSpeechEnglish = !hideSpeechEnglish; updateSpeechEnglishVisibility(); });
         speechPrevBtn.addEventListener('click', () => { if (currentWordIndex > 0) { currentWordIndex--; displayWord(); } });
         speechNextBtn.addEventListener('click', () => { if (currentWordIndex < activeWords.length - 1) { currentWordIndex++; displayWord(); } });
+
+        spellingPrevBtn.addEventListener('click', () => { if (currentWordIndex > 0) { currentWordIndex--; displayWord(); } });
+        spellingNextBtn.addEventListener('click', () => { if (currentWordIndex < activeWords.length - 1) { currentWordIndex++; displayWord(); } });
 
         flashcardPrevBtn.addEventListener('click', () => { if (currentWordIndex > 0) { currentWordIndex--; displayWord(); } });
         flashcardNextBtn.addEventListener('click', () => { if (currentWordIndex < activeWords.length - 1) { currentWordIndex++; displayWord(); } });
