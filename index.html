@@ -17,13 +17,8 @@
             min-height: 100vh;
             color: #2d3748;
         }
-
-        @keyframes float-gentle {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(1deg); }
-        }
+        @keyframes float-gentle { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
         .animate-float { animation: float-gentle 4s ease-in-out infinite; }
-
         .ghibli-card {
             background-color: #fdfbf7;
             background-image: radial-gradient(#e5e0d8 0.75px, transparent 0.75px);
@@ -31,29 +26,17 @@
             box-shadow: 0 12px 30px -8px rgba(20, 83, 45, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
             border: 1px solid rgba(217, 206, 186, 0.6);
         }
-
-        .ghibli-btn { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .ghibli-btn { transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .ghibli-btn:hover { transform: translateY(-2px) scale(1.01); }
         .ghibli-btn:active { transform: translateY(1px) scale(0.98); }
-
-        textarea::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         textarea::-webkit-scrollbar-track, .custom-scrollbar::-webkit-scrollbar-track { background: #f3efe6; border-radius: 99px; }
-        textarea::-webkit-scrollbar-thumb, .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #a7f3d0; border-radius: 99px; border: 2px solid #f3efe6; }
-
-        @keyframes blink-soft {
-            from, to { border-color: transparent; }
-            50% { border-color: #0284c7; }
-        }
+        textarea::-webkit-scrollbar-thumb, .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #a7f3d0; border-radius: 99px; }
+        @keyframes blink-soft { from, to { border-color: transparent; } 50% { border-color: #0284c7; } }
         #spelling-cursor {
-            display: inline-block;
-            width: 0;
-            height: 2.2rem;
-            border-right: 3px solid #0284c7;
-            animation: blink-soft 1s step-end infinite;
-            vertical-align: bottom;
-            margin-left: 2px;
+            display: inline-block; width: 0; height: 2rem; border-right: 3px solid #0284c7;
+            animation: blink-soft 1s step-end infinite; vertical-align: bottom; margin-left: 2px;
         }
-
         @keyframes shake-gentle {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
             20%, 80% { transform: translate3d(3px, 0, 0); }
@@ -61,20 +44,13 @@
             40%, 60% { transform: translate3d(5px, 0, 0); }
         }
         .animate-shake { animation: shake-gentle 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-
-        @keyframes ghibli-pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
-        }
+        @keyframes ghibli-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .recording { animation: ghibli-pulse 1.8s infinite; }
-
         .key-active {
-            transform: translateY(-2px) scale(1.12);
+            transform: translateY(-2px) scale(1.1);
             box-shadow: 0 0 0 3px #8b5cf6, 0 6px 14px rgba(139, 92, 246, 0.4) !important;
-            z-index: 20;
-            font-weight: 900;
+            z-index: 20; font-weight: 900;
         }
-
         .font-times { font-family: 'Times New Roman', Times, serif; }
         .keyboard-key { user-select: none; transition: all 0.15s ease; }
     </style>
@@ -82,7 +58,7 @@
 <body class="p-4 md:p-8 pb-20">
 
     <div class="w-full max-w-6xl mx-auto">
-        <!-- 主畫面區：Grid 佈局 -->
+        <!-- 主畫面區 -->
         <div id="main-section" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- 左側欄位 -->
@@ -94,9 +70,7 @@
                     <div class="flex justify-between items-center flex-wrap gap-3 relative z-10">
                         <div class="flex items-center gap-2.5">
                             <span class="text-2xl md:text-3xl animate-float">🌱</span>
-                            <div>
-                                <h1 class="text-xl md:text-2xl font-black tracking-wide text-amber-100 drop-shadow-sm">單字島</h1>
-                            </div>
+                            <h1 class="text-xl md:text-2xl font-black tracking-wide text-amber-100 drop-shadow-sm">單字島</h1>
                         </div>
                         <button id="toggle-edit-btn" class="ghibli-btn bg-amber-200/90 hover:bg-amber-100 text-emerald-900 font-extrabold text-sm px-3.5 py-1.5 rounded-2xl shadow-md border border-amber-300 flex items-center gap-1.5">
                             ✏️ 編輯單字庫
@@ -107,61 +81,61 @@
                         <p class="text-emerald-100 font-bold text-sm mb-2 flex items-center gap-1">
                             <span>📜</span> 「英文,中文」或「中文,英文」
                         </p>
-                        <textarea id="word-input" class="w-full h-48 p-4 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl text-amber-50 text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300/60 font-mono custom-scrollbar" placeholder="一行一個單字，支援 英文,中文 或 中文,英文">蘋果,apple
+                        <textarea id="word-input" class="w-full h-44 p-3 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl text-amber-50 text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300/60 font-mono custom-scrollbar" placeholder="一行一個單字">
+蘋果,apple
 香蕉,banana</textarea>
                     </div>
                 </div>
 
                 <!-- 自訂範圍選擇區塊 -->
-                <div id="range-selection-section" class="bg-sky-50/90 rounded-2xl p-3 md:p-3.5 text-slate-800 border border-sky-200/80 shadow-sm">
-                    <div class="flex justify-between items-center border-b border-sky-200/80 pb-1.5 mb-2 flex-wrap gap-2">
-                        <h2 class="text-base md:text-lg font-black text-emerald-900 flex items-center gap-2">
+                <div id="range-selection-section" class="bg-sky-50 rounded-2xl p-3 text-slate-800 border border-sky-300 shadow-sm">
+                    <div class="flex justify-between items-center border-b border-sky-200 pb-1.5 mb-2 flex-wrap gap-2">
+                        <h2 class="text-base font-black text-sky-950 flex items-center gap-2">
                             <span>🌾</span> 自訂範圍
                         </h2>
-                        <span id="total-words-badge" class="bg-sky-100 text-sky-800 font-bold px-2.5 py-0.5 rounded-full border border-sky-300/80 text-xs shadow-sm">
+                        <span id="total-words-badge" class="bg-sky-200 text-sky-900 font-bold px-2.5 py-0.5 rounded-full border border-sky-300 text-xs shadow-sm">
                             共 0 個單字
                         </span>
                     </div>
 
-                    <div class="bg-sky-100/60 p-2 rounded-xl border border-sky-200/80 text-sky-950 font-bold text-xs md:text-sm flex flex-wrap lg:flex-nowrap items-center gap-1 md:gap-1.5">
+                    <div class="bg-sky-100/70 p-2 rounded-xl border border-sky-200 text-sky-950 font-bold text-xs md:text-sm flex flex-wrap lg:flex-nowrap items-center gap-1 md:gap-1.5">
                         <span>第</span>
-                        <input type="number" id="range-start" min="1" placeholder="" class="w-12 md:w-14 p-0.5 text-center font-black text-sm md:text-base border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
+                        <input type="number" id="range-start" min="1" class="w-12 md:w-14 p-0.5 text-center font-black text-sm border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
                         <span>到第</span>
-                        <input type="number" id="range-end" min="1" placeholder="" class="w-12 md:w-14 p-0.5 text-center font-black text-sm md:text-base border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
+                        <input type="number" id="range-end" min="1" class="w-12 md:w-14 p-0.5 text-center font-black text-sm border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
                         <span>項，及第</span>
                         <input type="text" id="range-extra" placeholder="例: 3 5" class="w-20 md:w-24 p-0.5 text-center font-black text-sm border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
                         <span>項</span>
-                        <button id="btn-apply-range" class="ghibli-btn bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs md:text-sm px-3 py-1 rounded-lg shadow-md border border-sky-500 ml-auto flex items-center gap-1 whitespace-nowrap">
+                        <button id="btn-apply-range" class="ghibli-btn bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs md:text-sm px-3 py-1 rounded-lg shadow-md border border-sky-500 ml-auto whitespace-nowrap">
                             🍃 選擇
                         </button>
                     </div>
                 </div>
 
-                <!-- 已選取的單字清單預覽區 -->
-                <div class="ghibli-card rounded-3xl p-6">
+                <!-- 已選取的單字清單區 -->
+                <div class="ghibli-card rounded-3xl p-5">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-lg font-black text-emerald-900 flex items-center gap-2">
                             <span>🍃</span> 已選取的單字
                         </h3>
-                        <span id="selected-count-tag" class="bg-sky-100 text-sky-800 font-bold text-xs px-3 py-1 rounded-full border border-sky-200 shadow-sm">
+                        <span id="selected-count-tag" class="bg-sky-200 text-sky-900 font-bold text-xs px-3 py-1 rounded-full border border-sky-300 shadow-sm">
                             已選 0 個
                         </span>
                     </div>
-                    <div id="selected-words-list" class="custom-scrollbar max-h-52 overflow-y-auto bg-amber-50/50 border border-amber-200/60 rounded-2xl p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 font-bold">
+                    <div id="selected-words-list" class="custom-scrollbar max-h-48 overflow-y-auto bg-amber-50/50 border border-amber-200/60 rounded-2xl p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 font-bold">
                     </div>
                 </div>
             </div>
 
-            <!-- 右側欄位 -->
+            <!-- 右側欄位：模式選擇 -->
             <div class="lg:col-span-5 space-y-6">
-                <!-- 模式選擇區 -->
                 <div id="mode-selection-section" class="ghibli-card rounded-3xl p-6 md:p-8 text-center">
                     <h2 class="text-2xl font-black text-emerald-950 flex items-center justify-center gap-2">
                         <span>✨</span> 選擇練習模式
                     </h2>
 
                     <div class="mt-6 space-y-3">
-                        <button data-mode="flashcard_en2zh" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-amber-300 hover:brightness-105">
+                        <button data-mode="flashcard_en2zh" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-amber-300">
                             猜中文
                         </button>
                         <button data-mode="speech" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-emerald-500">
@@ -170,7 +144,7 @@
                         <button data-mode="jumble" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-rose-300">
                             字母重組
                         </button>
-                        <button data-mode="spelling" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-sky-400 hover:brightness-105">
+                        <button data-mode="spelling" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-sky-400">
                             拼單字
                         </button>
                         <button data-mode="typing" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-purple-400">
@@ -178,16 +152,16 @@
                         </button>
                     </div>
                 </div>
-
             </div>
 
         </div>
 
         <!-- 練習區塊 -->
         <div id="practice-section" class="hidden max-w-3xl mx-auto">
+            <div id="toast-message" class="hidden text-center text-sm font-bold text-rose-800 bg-rose-100 border border-rose-300 rounded-xl py-1.5 px-4 mb-2 shadow-sm animate-bounce"></div>
             <div id="progress-indicator" class="text-center text-lg md:text-xl font-black mb-2 text-emerald-950 tracking-wide"></div>
             
-            <div id="practice-card" class="relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-colors duration-300">
+            <div id="practice-card" class="relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-all duration-300">
                 <div id="feedback-indicator" class="absolute top-3 left-4 text-3xl md:text-4xl font-black"></div>
                 <div id="score-tracker" class="hidden absolute top-3 right-4 text-xs md:text-sm font-black text-emerald-900 bg-emerald-100/90 px-3 py-1 rounded-full border border-emerald-300 shadow-sm flex items-center gap-1">
                     答對: 0 / 0
@@ -244,7 +218,7 @@
                         </div>
                     </div>
 
-                    <!-- 英文打字計時模式 -->
+                    <!-- 英文打字模式 -->
                     <div id="typing-mode" class="hidden text-center space-y-2">
                         <div class="flex justify-around items-center bg-purple-50/90 p-2 md:p-2.5 rounded-xl border border-purple-200 text-purple-950 font-bold text-xs md:text-sm shadow-sm flex-wrap gap-1.5">
                             <div class="flex items-center gap-1">
@@ -264,10 +238,11 @@
                             <div id="typing-target-word" class="font-times text-2xl md:text-4xl lg:text-5xl font-black tracking-widest min-h-[48px] flex justify-center items-center gap-1 flex-wrap bg-amber-50/50 p-2 rounded-xl border-2 border-dashed border-purple-300 whitespace-pre"></div>
                             <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="" class="font-times w-full text-center text-2xl md:text-3xl font-bold py-2 px-3 bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl outline-none shadow-inner transition-all">
                             <div id="typing-enter-hint" class="hidden text-emerald-800 text-xs font-black bg-emerald-100 border border-emerald-300 py-1 px-3 rounded-full inline-block animate-bounce">✨ 正確！請按 Enter 鍵進入下一題 ↵</div>
+                            <div id="typing-timeout-banner" class="hidden text-purple-900 text-xs font-black bg-purple-100 border border-purple-300 py-1.5 px-3 rounded-full inline-block">⏱️ 時間到！打字速度：<span id="banner-wpm">0</span> 字/分</div>
                             <div id="caps-lock-warning" class="hidden text-amber-800 text-xs font-bold bg-amber-100/90 border border-amber-300 py-0.5 px-2 rounded-full inline-block">⚠️ 大寫鎖定 (Caps Lock) 已開啟</div>
                         </div>
 
-                        <!-- 動態生成 QWERTY 電腦鍵盤 -->
+                        <!-- QWERTY 電腦鍵盤指法 -->
                         <div id="virtual-keyboard-section" class="bg-amber-100/40 p-2 rounded-xl border border-amber-200/60 mt-2">
                             <div class="text-xs font-extrabold text-amber-900/80 mb-1 flex justify-end items-center px-1">
                                 <button id="toggle-keyboard-btn" type="button" class="ghibli-btn bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-0.5 rounded-lg text-xs font-extrabold border border-amber-300 shadow-sm">👁️ 隱藏指法</button>
@@ -281,7 +256,7 @@
                     檢查答案
                 </button>
 
-                <!-- 拼單字模式 上一個 / 下一個 按鈕區塊 -->
+                <!-- 拼單字模式導覽區塊 -->
                 <div id="spelling-nav-container" class="hidden mt-3 flex justify-center items-center gap-3">
                     <button id="spelling-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
                         ⬅️ 上一個
@@ -291,7 +266,7 @@
                     </button>
                 </div>
 
-                <!-- 猜中文模式 上一個 / 下一個 按鈕區塊 -->
+                <!-- 猜中文模式導覽區塊 -->
                 <div id="flashcard-nav-container" class="hidden mt-6 flex justify-center items-center gap-3">
                     <button id="flashcard-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-5 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
                         ⬅️ 上一個
@@ -307,31 +282,24 @@
             </div>
         </div>
     </div>
-
-    <!-- Author Tag -->
-    <p class="fixed bottom-4 right-4 bg-white/80 backdrop-blur-md py-1.5 px-4 rounded-full border border-emerald-200/80 text-xs font-semibold text-emerald-900 shadow-md z-50 flex items-center gap-1">
-        <span>🌱</span> Made by 阿剛老師
     </p>
 
     <script>
-        // DOM Helper
         const $ = id => document.getElementById(id);
 
         const mainSection = $('main-section'), practiceSection = $('practice-section'), practiceCard = $('practice-card');
         const wordInput = $('word-input'), wordInputContainer = $('word-input-container'), toggleEditBtn = $('toggle-edit-btn');
         const totalWordsBadge = $('total-words-badge'), startRangeInput = $('range-start'), endRangeInput = $('range-end'), rangeExtraInput = $('range-extra');
-        const selectedCountTag = $('selected-count-tag'), selectedWordsList = $('selected-words-list');
+        const selectedCountTag = $('selected-count-tag'), selectedWordsList = $('selected-words-list'), toastMessage = $('toast-message');
         const progressIndicator = $('progress-indicator'), chineseWord = $('chinese-word'), englishWordContainer = $('english-word-container'), englishWord = $('english-word');
         const checkAnswerBtn = $('check-answer-btn'), speakEmojiBtn = $('speak-emoji-btn'), backToMainBtn = $('back-to-main-button'), feedbackIndicator = $('feedback-indicator'), scoreTracker = $('score-tracker');
 
-        // Modes
         const spellingModeDiv = $('spelling-mode'), spellingAnswer = $('spelling-answer'), spellingInputText = $('spelling-input-text'), alphabetKeyboard = $('alphabet-keyboard'), spellingNavContainer = $('spelling-nav-container'), spellingPrevBtn = $('spelling-prev-btn'), spellingNextBtn = $('spelling-next-btn');
         const jumbleModeDiv = $('jumble-mode'), jumbleAnswer = $('jumble-answer'), jumblePool = $('jumble-pool'), jumbleCapsBtn = $('jumble-caps-btn'), jumbleClearBtn = $('jumble-clear-btn');
         const speechModeDiv = $('speech-mode'), toggleSpeechEnglishBtn = $('toggle-speech-english-btn'), recordBtn = $('record-btn'), recognitionStatus = $('recognition-status'), recognizedText = $('recognized-text'), speechPrevBtn = $('speech-prev-btn'), speechNextBtn = $('speech-next-btn');
         const flashcardNavContainer = $('flashcard-nav-container'), flashcardPrevBtn = $('flashcard-prev-btn'), flashcardNextBtn = $('flashcard-next-btn');
-        const typingModeDiv = $('typing-mode'), typingTimeSelect = $('typing-time-select'), typingTimerDisplay = $('typing-timer'), typingWpmDisplay = $('typing-wpm'), typingAccuracyDisplay = $('typing-accuracy'), typingTargetWord = $('typing-target-word'), typingInput = $('typing-input'), typingEnterHint = $('typing-enter-hint'), capsLockWarning = $('caps-lock-warning'), toggleKeyboardBtn = $('toggle-keyboard-btn'), virtualKeyboardBody = $('virtual-keyboard-body');
+        const typingModeDiv = $('typing-mode'), typingTimeSelect = $('typing-time-select'), typingTimerDisplay = $('typing-timer'), typingWpmDisplay = $('typing-wpm'), typingAccuracyDisplay = $('typing-accuracy'), typingTargetWord = $('typing-target-word'), typingInput = $('typing-input'), typingEnterHint = $('typing-enter-hint'), typingTimeoutBanner = $('typing-timeout-banner'), bannerWpm = $('banner-wpm'), capsLockWarning = $('caps-lock-warning'), toggleKeyboardBtn = $('toggle-keyboard-btn'), virtualKeyboardBody = $('virtual-keyboard-body');
 
-        // State variables
         let typingTimerInterval = null, typingRemainingSeconds = 60, typingTotalAllocatedSeconds = 60, typingStartTime = null;
         let typingTotalTypedChars = 0, typingCorrectTypedChars = 0, isCurrentWordWordCorrect = false;
         let currentWordIndex = 0, currentMode = '', allParsedWords = [], activeWords = [];
@@ -342,7 +310,6 @@
         let recognition = null, isRecording = false;
         const synth = window.speechSynthesis;
 
-        // --- 音效與語音 ---
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -368,7 +335,12 @@
             synth.speak(utter);
         }
 
-        // --- 鍵盤建立 (拼字與打字) ---
+        function showToast(msg) {
+            toastMessage.textContent = msg;
+            toastMessage.classList.remove('hidden');
+            setTimeout(() => toastMessage.classList.add('hidden'), 3000);
+        }
+
         function createAlphabetKeyboard() {
             alphabetKeyboard.innerHTML = '';
             const qwerty = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m']];
@@ -426,7 +398,6 @@
             alphabetKeyboard.appendChild(wrapper);
         }
 
-        // 動態生成打字模式 QWERTY 指法鍵盤
         function createTypingKeyboard() {
             virtualKeyboardBody.innerHTML = '';
             const keyColors = {
@@ -461,7 +432,6 @@
             });
         }
 
-        // --- 資料處理與選取範圍 ---
         function processWords(text) {
             return text.trim().split('\n').map(line => {
                 const p = line.trim().split(/,|\t|，/).map(s => s.trim());
@@ -519,17 +489,16 @@
 
             items.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'bg-white/80 border border-emerald-200/60 p-2.5 rounded-xl flex items-center justify-start gap-2 shadow-sm min-w-0';
+                card.className = 'bg-white/80 border border-emerald-200/60 p-2 rounded-xl flex items-center justify-start gap-2 shadow-sm min-w-0';
                 card.innerHTML = `
                     <span class="bg-sky-200 text-sky-900 font-black text-xs px-2 py-0.5 rounded-md shrink-0 border border-sky-300">${item.index}</span>
-                    <span class="font-black text-emerald-950 text-xl md:text-2xl truncate shrink-0 max-w-[45%] font-times">${item.word.english}</span>
-                    <span class="text-slate-600 text-sm md:text-base font-bold truncate">${item.word.chinese}</span>
+                    <span class="font-black text-emerald-950 text-lg md:text-xl truncate shrink-0 max-w-[45%] font-times">${item.word.english}</span>
+                    <span class="text-slate-600 text-xs md:text-sm font-bold truncate">${item.word.chinese}</span>
                 `;
                 selectedWordsList.appendChild(card);
             });
         }
 
-        // --- 練習模式 logic ---
         function showSection(name) {
             mainSection.classList.toggle('hidden', name !== 'main');
             practiceSection.classList.toggle('hidden', name !== 'practice');
@@ -556,10 +525,8 @@
             
             englishWord.textContent = currentMode === 'flashcard_en2zh' ? cur.chinese : cur.english;
             englishWord.className = currentMode === 'flashcard_en2zh' 
-                ? 'text-5xl md:text-7xl font-black text-black drop-shadow-sm mt-2' 
-                : (currentMode === 'speech' 
-                    ? 'text-4xl md:text-6xl font-black text-emerald-700 drop-shadow-sm font-times mt-2' 
-                    : 'text-5xl md:text-7xl font-black text-emerald-700 drop-shadow-sm font-times');
+                ? 'text-5xl md:text-7xl font-black text-black drop-shadow-sm mt-8 pt-2' 
+                : 'text-4xl md:text-6xl font-black text-emerald-700 drop-shadow-sm font-times mt-2';
 
             feedbackIndicator.textContent = '';
             englishWordContainer.classList.add('hidden');
@@ -580,7 +547,7 @@
                     const isSpace = letter === ' ';
                     btn.className = isSpace 
                         ? 'letter-btn ghibli-btn bg-amber-300 hover:bg-amber-400 border-2 border-amber-500 shadow-sm w-10 md:w-12 h-11 md:h-14 rounded-xl'
-                        : 'letter-btn ghibli-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-black text-2xl md:text-3xl py-2.5 px-4 rounded-xl border border-emerald-300 shadow-sm font-times';
+                        : 'letter-btn ghibli-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-black text-2xl md:text-3xl py-2 px-3.5 rounded-xl border border-emerald-300 shadow-sm font-times';
                     btn.textContent = isSpace ? '' : (isCaps ? letter.toUpperCase() : letter);
                     btn.dataset.char = letter;
                     btn.onclick = () => {
@@ -600,6 +567,7 @@
             } else if (currentMode === 'typing') {
                 typingInput.value = ''; isCurrentWordWordCorrect = false;
                 typingEnterHint.classList.add('hidden');
+                typingTimeoutBanner.classList.add('hidden');
                 renderTypingTarget();
                 setTimeout(() => typingInput.focus(), 100);
             }
@@ -648,11 +616,9 @@
                     correctWordSet.add(currentWordIndex);
                     updateScoreTracker();
                     alphabetKeyboard.classList.add('opacity-50', 'pointer-events-none');
-                    // 拼單字答對後自動切換下一題
                     setTimeout(() => {
                         if (currentWordIndex < activeWords.length - 1) {
-                            currentWordIndex++;
-                            displayWord();
+                            currentWordIndex++; displayWord();
                         } else {
                             feedbackIndicator.textContent = '🏆';
                         }
@@ -664,7 +630,6 @@
             }
         }
 
-        // --- 語音辨識 ---
         function initSpeechRecognition() {
             if (!SpeechRecognition) {
                 const btn = document.querySelector('button[data-mode="speech"]');
@@ -695,8 +660,7 @@
                 updateScoreTracker();
                 recordBtn.disabled = true; 
                 englishWordContainer.classList.remove('hidden'); 
-            }
-            else { recognitionStatus.textContent = '再試一次看看喔！'; }
+            } else { recognitionStatus.textContent = '再試一次看看喔！'; }
         }
 
         function updateSpeechEnglishVisibility() {
@@ -704,7 +668,6 @@
             toggleSpeechEnglishBtn.textContent = hideSpeechEnglish ? '👁️ 顯示英文' : '👁️ 隱藏英文';
         }
 
-        // --- 打字練習邏輯 ---
         function resetTypingStats() {
             clearInterval(typingTimerInterval); typingTimerInterval = null;
             typingTotalAllocatedSeconds = parseInt(typingTimeSelect.value) || 60;
@@ -718,6 +681,7 @@
             typingAccuracyDisplay.textContent = '100%';
             typingInput.disabled = false; typingInput.value = '';
             typingEnterHint.classList.add('hidden');
+            typingTimeoutBanner.classList.add('hidden');
         }
 
         function startTypingTimer() {
@@ -734,7 +698,8 @@
 
                 if (typingRemainingSeconds <= 0) {
                     clearInterval(typingTimerInterval); typingTimerInterval = null; typingInput.disabled = true;
-                    alert(`⏱️ 時間到！\n打字速度：${typingWpmDisplay.textContent} 字/分\n正確率：${typingAccuracyDisplay.textContent}`);
+                    bannerWpm.textContent = typingWpmDisplay.textContent;
+                    typingTimeoutBanner.classList.remove('hidden');
                 }
             }, 1000);
         }
@@ -819,7 +784,7 @@
         function startPractice(mode) {
             initAudio();
             const selectedWords = getSelectedWordsWithIndices().map(i => i.word);
-            if (!selectedWords.length) { alert('請先選擇或輸入有效的單字！'); return; }
+            if (!selectedWords.length) { showToast('請先選擇或輸入有效的單字！'); return; }
 
             currentMode = mode;
             activeWords = shuffleArray(selectedWords);
@@ -828,11 +793,11 @@
 
             if (practiceCard) {
                 if (mode === 'flashcard_en2zh') {
-                    practiceCard.className = "relative rounded-3xl p-6 md:p-8 h-[320px] md:h-[360px] flex flex-col items-center justify-between border-2 bg-amber-100/90 border-amber-300/80 shadow-lg shadow-amber-900/10 transition-colors duration-300";
+                    practiceCard.className = "relative rounded-3xl p-6 md:p-8 h-[320px] md:h-[360px] flex flex-col items-center justify-between border-2 bg-amber-100/90 border-amber-300/80 shadow-lg shadow-amber-900/10 transition-all duration-300";
                 } else if (mode === 'spelling') {
-                    practiceCard.className = "relative rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 bg-sky-50/90 border-sky-300/80 shadow-lg shadow-sky-900/10 transition-colors duration-300";
+                    practiceCard.className = "relative rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 bg-sky-50/90 border-sky-300/80 shadow-lg shadow-sky-900/10 transition-all duration-300";
                 } else {
-                    practiceCard.className = "relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-colors duration-300";
+                    practiceCard.className = "relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-all duration-300";
                 }
             }
 
@@ -850,7 +815,6 @@
             showSection('practice'); displayWord();
         }
 
-        // Event listeners
         recordBtn.addEventListener('click', () => {
             initAudio();
             if (isRecording) { try { recognition.stop(); } catch(e){} }
