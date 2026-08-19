@@ -189,6 +189,9 @@
             
             <div id="practice-card" class="relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-colors duration-300">
                 <div id="feedback-indicator" class="absolute top-3 left-4 text-3xl md:text-4xl font-black"></div>
+                <div id="score-tracker" class="hidden absolute top-3 right-4 text-xs md:text-sm font-black text-emerald-900 bg-emerald-100/90 px-3 py-1 rounded-full border border-emerald-300 shadow-sm flex items-center gap-1">
+                    答對: 0 / 0
+                </div>
                 
                 <div class="w-full">
                     <div class="text-2xl md:text-4xl font-black text-center text-slate-800 break-all flex justify-center items-center gap-x-3 flex-wrap">
@@ -319,7 +322,7 @@
         const totalWordsBadge = $('total-words-badge'), startRangeInput = $('range-start'), endRangeInput = $('range-end'), rangeExtraInput = $('range-extra');
         const selectedCountTag = $('selected-count-tag'), selectedWordsList = $('selected-words-list');
         const progressIndicator = $('progress-indicator'), chineseWord = $('chinese-word'), englishWordContainer = $('english-word-container'), englishWord = $('english-word');
-        const checkAnswerBtn = $('check-answer-btn'), speakEmojiBtn = $('speak-emoji-btn'), backToMainBtn = $('back-to-main-button'), feedbackIndicator = $('feedback-indicator');
+        const checkAnswerBtn = $('check-answer-btn'), speakEmojiBtn = $('speak-emoji-btn'), backToMainBtn = $('back-to-main-button'), feedbackIndicator = $('feedback-indicator'), scoreTracker = $('score-tracker');
 
         // Modes
         const spellingModeDiv = $('spelling-mode'), spellingAnswer = $('spelling-answer'), spellingInputText = $('spelling-input-text'), alphabetKeyboard = $('alphabet-keyboard'), spellingNavContainer = $('spelling-nav-container'), spellingPrevBtn = $('spelling-prev-btn'), spellingNextBtn = $('spelling-next-btn');
@@ -332,6 +335,7 @@
         let typingTimerInterval = null, typingRemainingSeconds = 60, typingTotalAllocatedSeconds = 60, typingStartTime = null;
         let typingTotalTypedChars = 0, typingCorrectTypedChars = 0, isCurrentWordWordCorrect = false;
         let currentWordIndex = 0, currentMode = '', allParsedWords = [], activeWords = [];
+        let correctWordSet = new Set();
         let audioCtx = null, isCaps = false, hideSpeechEnglish = false;
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -531,9 +535,19 @@
             practiceSection.classList.toggle('hidden', name !== 'practice');
         }
 
+        function updateScoreTracker() {
+            if (currentMode === 'flashcard_en2zh') {
+                scoreTracker.classList.add('hidden');
+            } else {
+                scoreTracker.classList.remove('hidden');
+                scoreTracker.textContent = `答對: ${correctWordSet.size} / ${activeWords.length}`;
+            }
+        }
+
         function displayWord() {
             const cur = activeWords[currentWordIndex];
             progressIndicator.textContent = `單字 ${currentWordIndex + 1} / ${activeWords.length}`;
+            updateScoreTracker();
             
             if (recognition && isRecording) { try { recognition.stop(); } catch(e){} }
 
@@ -598,13 +612,14 @@
                 feedbackIndicator.textContent = '🌸';
                 englishWordContainer.classList.remove('hidden');
                 jumblePool.innerHTML = '';
+                correctWordSet.add(currentWordIndex);
+                updateScoreTracker();
 
                 setTimeout(() => {
                     if (currentWordIndex < activeWords.length - 1) {
                         currentWordIndex++; displayWord();
                     } else {
                         feedbackIndicator.textContent = '🏆';
-                        setTimeout(() => { alert('🎉 恭喜！您已完成所有單字的字母重組練習！'); showSection('main'); }, 300);
                     }
                 }, 800);
             }
@@ -630,6 +645,8 @@
                 englishWordContainer.classList.remove('hidden');
                 checkAnswerBtn.disabled = true;
                 if (currentMode === 'spelling') {
+                    correctWordSet.add(currentWordIndex);
+                    updateScoreTracker();
                     alphabetKeyboard.classList.add('opacity-50', 'pointer-events-none');
                     // 拼單字答對後自動切換下一題
                     setTimeout(() => {
@@ -638,10 +655,6 @@
                             displayWord();
                         } else {
                             feedbackIndicator.textContent = '🏆';
-                            setTimeout(() => {
-                                alert('🎉 恭喜！您已完成所有單字的拼字練習！');
-                                showSection('main');
-                            }, 300);
                         }
                     }, 800);
                 }
@@ -677,7 +690,12 @@
 
             playSound(isCorrect ? 'correct' : 'incorrect');
             feedbackIndicator.textContent = isCorrect ? '🌸' : '🍂';
-            if (isCorrect) { recordBtn.disabled = true; englishWordContainer.classList.remove('hidden'); }
+            if (isCorrect) { 
+                correctWordSet.add(currentWordIndex);
+                updateScoreTracker();
+                recordBtn.disabled = true; 
+                englishWordContainer.classList.remove('hidden'); 
+            }
             else { recognitionStatus.textContent = '再試一次看看喔！'; }
         }
 
@@ -766,6 +784,8 @@
                     playSound('correct');
                     feedbackIndicator.textContent = '🌸';
                     typingEnterHint.classList.remove('hidden');
+                    correctWordSet.add(currentWordIndex);
+                    updateScoreTracker();
                 }
             } else {
                 isCurrentWordWordCorrect = false;
@@ -793,8 +813,6 @@
             } else {
                 clearInterval(typingTimerInterval);
                 feedbackIndicator.textContent = '🏆';
-                alert(`🎉 恭喜完成！\n打字速度：${typingWpmDisplay.textContent} 字/分\n正確率：${typingAccuracyDisplay.textContent}`);
-                showSection('main');
             }
         }
 
@@ -806,6 +824,7 @@
             currentMode = mode;
             activeWords = shuffleArray(selectedWords);
             currentWordIndex = 0;
+            correctWordSet.clear();
 
             if (practiceCard) {
                 if (mode === 'flashcard_en2zh') {
