@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字島</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #e0f2fe 0%, #ecfdf5 35%, #fef3c7 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(1deg); }
+        }
+        .animate-float { animation: float-gentle 4s ease-in-out infinite; }
+
+        .ghibli-card {
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#e5e0d8 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
+            box-shadow: 0 12px 30px -8px rgba(20, 83, 45, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(217, 206, 186, 0.6);
+        }
+
+        .ghibli-btn { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .ghibli-btn:hover { transform: translateY(-2px) scale(1.01); }
+        .ghibli-btn:active { transform: translateY(1px) scale(0.98); }
+
+        textarea::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track, .custom-scrollbar::-webkit-scrollbar-track { background: #f3efe6; border-radius: 99px; }
+        textarea::-webkit-scrollbar-thumb, .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #a7f3d0; border-radius: 99px; border: 2px solid #f3efe6; }
+
+        @keyframes blink-soft {
+            from, to { border-color: transparent; }
+            50% { border-color: #0284c7; }
+        }
+        #spelling-cursor {
+            display: inline-block;
+            width: 0;
+            height: 2.2rem;
+            border-right: 3px solid #0284c7;
+            animation: blink-soft 1s step-end infinite;
+            vertical-align: bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes shake-gentle {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(3px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
+        }
+        .animate-shake { animation: shake-gentle 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes ghibli-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 18px rgba(239, 68, 68, 0); }
+        }
+        .recording { animation: ghibli-pulse 1.8s infinite; }
+
+        .key-active {
+            transform: translateY(-2px) scale(1.12);
+            box-shadow: 0 0 0 3px #8b5cf6, 0 6px 14px rgba(139, 92, 246, 0.4) !important;
+            z-index: 20;
+            font-weight: 900;
+        }
+
+        .font-times { font-family: 'Times New Roman', Times, serif; }
+        .keyboard-key { user-select: none; transition: all 0.15s ease; }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-20">
+
+    <div class="w-full max-w-6xl mx-auto">
+        <!-- 主畫面區：Grid 佈局 -->
+        <div id="main-section" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- 左側欄位 -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- 標題與單字庫編輯區 -->
+                <div class="bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-800 text-white rounded-3xl p-4 md:p-5 shadow-xl shadow-emerald-950/15 border border-emerald-500/30 relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 text-emerald-600/30 text-9xl select-none pointer-events-none">🌿</div>
+                    
+                    <div class="flex justify-between items-center flex-wrap gap-3 relative z-10">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-2xl md:text-3xl animate-float">🌱</span>
+                            <div>
+                                <h1 class="text-xl md:text-2xl font-black tracking-wide text-amber-100 drop-shadow-sm">單字島</h1>
+                            </div>
+                        </div>
+                        <button id="toggle-edit-btn" class="ghibli-btn bg-amber-200/90 hover:bg-amber-100 text-emerald-900 font-extrabold text-sm px-3.5 py-1.5 rounded-2xl shadow-md border border-amber-300 flex items-center gap-1.5">
+                            ✏️ 編輯單字庫
+                        </button>
+                    </div>
+                    
+                    <div id="word-input-container" class="hidden mt-4 relative z-10">
+                        <p class="text-emerald-100 font-bold text-sm mb-2 flex items-center gap-1">
+                            <span>📜</span> 「英文,中文」或「中文,英文」
+                        </p>
+                        <textarea id="word-input" class="w-full h-48 p-4 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl text-amber-50 text-base shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300/60 font-mono custom-scrollbar" placeholder="「英文,中文」或「中文,英文」">
+蘋果,apple
+香蕉,banana</textarea>
+                    </div>
+                </div>
+
+                <!-- 自訂範圍選擇區塊 -->
+                <div id="range-selection-section" class="bg-sky-50/90 rounded-2xl p-3 md:p-3.5 text-slate-800 border border-sky-200/80 shadow-sm">
+                    <div class="flex justify-between items-center border-b border-sky-200/80 pb-1.5 mb-2 flex-wrap gap-2">
+                        <h2 class="text-base md:text-lg font-black text-emerald-900 flex items-center gap-2">
+                            <span>🌾</span> 自訂範圍
+                        </h2>
+                        <span id="total-words-badge" class="bg-sky-100 text-sky-800 font-bold px-2.5 py-0.5 rounded-full border border-sky-300/80 text-xs shadow-sm">
+                            共 0 個單字
+                        </span>
+                    </div>
+
+                    <div class="bg-sky-100/60 p-2 rounded-xl border border-sky-200/80 text-sky-950 font-bold text-xs md:text-sm flex flex-wrap lg:flex-nowrap items-center gap-1 md:gap-1.5">
+                        <span>第</span>
+                        <input type="number" id="range-start" min="1" placeholder="" class="w-12 md:w-14 p-0.5 text-center font-black text-sm md:text-base border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
+                        <span>到第</span>
+                        <input type="number" id="range-end" min="1" placeholder="" class="w-12 md:w-14 p-0.5 text-center font-black text-sm md:text-base border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
+                        <span>項，及第</span>
+                        <input type="text" id="range-extra" placeholder="例: 3 5" class="w-20 md:w-24 p-0.5 text-center font-black text-sm border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 bg-white text-sky-950 shadow-sm">
+                        <span>項</span>
+                        <button id="btn-apply-range" class="ghibli-btn bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs md:text-sm px-3 py-1 rounded-lg shadow-md border border-sky-500 ml-auto flex items-center gap-1 whitespace-nowrap">
+                            🍃 選擇
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 已選取的單字清單預覽區 -->
+                <div class="ghibli-card rounded-3xl p-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-black text-emerald-900 flex items-center gap-2">
+                            <span>🍃</span> 已選取的單字
+                        </h3>
+                        <span id="selected-count-tag" class="bg-sky-100 text-sky-800 font-bold text-xs px-3 py-1 rounded-full border border-sky-200 shadow-sm">
+                            已選 0 個
+                        </span>
+                    </div>
+                    <div id="selected-words-list" class="custom-scrollbar max-h-52 overflow-y-auto bg-amber-50/50 border border-amber-200/60 rounded-2xl p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 font-bold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側欄位 -->
+            <div class="lg:col-span-5 space-y-6">
+                <!-- 模式選擇區 -->
+                <div id="mode-selection-section" class="ghibli-card rounded-3xl p-6 md:p-8 text-center">
+                    <h2 class="text-2xl font-black text-emerald-950 flex items-center justify-center gap-2">
+                        <span>✨</span> 選擇遊戲模式✨
+                    </h2>
+
+                    <div class="mt-6 space-y-3">
+                        <button data-mode="flashcard_en2zh" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-amber-300 hover:brightness-105">
+                            猜中文
+                        </button>
+                        <button data-mode="speech" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-emerald-500">
+                            語音辨識
+                        </button>
+                        <button data-mode="jumble" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-rose-300">
+                            字母重組
+                        </button>
+                        <button data-mode="spelling" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-sky-400 hover:brightness-105">
+                            拼單字
+                        </button>
+                        <button data-mode="typing" class="mode-btn ghibli-btn w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-lg py-3.5 rounded-2xl shadow-md border border-purple-400">
+                            英文打字
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 練習區塊 -->
+        <div id="practice-section" class="hidden max-w-3xl mx-auto">
+            <div id="progress-indicator" class="text-center text-lg md:text-xl font-black mb-2 text-emerald-950 tracking-wide"></div>
+            
+            <div id="practice-card" class="relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-colors duration-300">
+                <div id="feedback-indicator" class="absolute top-3 left-4 text-3xl md:text-4xl font-black"></div>
+                
+                <div class="w-full">
+                    <div class="text-2xl md:text-4xl font-black text-center text-slate-800 break-all flex justify-center items-center gap-x-3 flex-wrap">
+                        <span id="chinese-word" class="drop-shadow-sm"></span>
+                        <button id="speak-emoji-btn" class="text-2xl md:text-3xl hover:scale-110 transition-transform active:scale-90" title="朗讀英文">🔊</button>
+                    </div>
+                    <div id="english-word-container" class="hidden text-center mt-3 pt-1">
+                        <h2 id="english-word" class="font-times text-3xl md:text-5xl font-black text-emerald-700 drop-shadow-sm"></h2>
+                    </div>
+                </div>
+
+                <!-- 練習互動區 -->
+                <div id="interaction-area" class="w-full mt-3">
+                    <!-- 拼字模式 -->
+                    <div id="spelling-mode" class="hidden">
+                        <div id="spelling-answer" class="w-full bg-sky-50/90 min-h-[48px] p-2 flex justify-center items-center flex-wrap gap-1 text-2xl md:text-4xl font-bold text-slate-800 tracking-widest rounded-2xl border-2 border-dashed border-sky-300 font-times shadow-inner">
+                            <span id="spelling-input-text"></span><span id="spelling-cursor" class="h-6 md:h-8"></span>
+                        </div>
+                        <div id="alphabet-keyboard" class="w-full mt-2 p-1 flex justify-center items-center flex-wrap gap-1"></div>
+                        <div class="mt-3 flex justify-center items-center gap-3">
+                            <button id="speech-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
+                                ⬅️ 上一個
+                            </button>
+                            <button id="speech-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
+                                下一個 ➡️
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 字母重組模式 -->
+                    <div id="jumble-mode" class="hidden">
+                        <div id="jumble-answer" class="w-full bg-amber-50/80 min-h-[48px] p-2 flex justify-center items-center flex-wrap gap-1.5 border-2 border-dashed border-amber-300 rounded-2xl font-times"></div>
+                        <div id="jumble-pool" class="w-full mt-2 p-1 flex justify-center items-center flex-wrap gap-1.5"></div>
+                        <div class="w-full mt-2 flex justify-center items-center flex-wrap gap-2">
+                            <button id="jumble-caps-btn" class="ghibli-btn bg-stone-200 hover:bg-stone-300 text-slate-800 font-bold text-sm py-1.5 px-4 rounded-xl border border-stone-300 shadow-sm">大小寫</button>
+                            <button id="jumble-clear-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm">🧹 清除全部</button>
+                        </div>
+                    </div>
+
+                    <!-- 語音辨識模式 -->
+                    <div id="speech-mode" class="hidden text-center relative">
+                        <button id="toggle-speech-english-btn" type="button" class="absolute -top-3 right-0 ghibli-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-900 px-2.5 py-1 rounded-xl font-bold text-xs border border-emerald-300 shadow-sm flex items-center gap-1 z-10">
+                            👁️ 隱藏英文
+                        </button>
+                        <button id="record-btn" class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gradient-to-tr from-rose-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-lg shadow-rose-900/20 ghibli-btn border-4 border-white disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"></path></svg>
+                        </button>
+                        <p id="recognition-status" class="mt-2 text-sm font-bold text-slate-600 h-6">點擊麥克風開始</p>
+                        <div class="mt-1 min-h-[2.5rem] text-2xl md:text-4xl font-black text-emerald-900 font-times" id="recognized-text"></div>
+
+                        <div class="mt-3 flex justify-center items-center gap-3">
+                            <button id="speech-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
+                                ⬅️ 上一個
+                            </button>
+                            <button id="speech-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
+                                下一個 ➡️
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 英文打字計時模式 -->
+                    <div id="typing-mode" class="hidden text-center space-y-2">
+                        <div class="flex justify-around items-center bg-purple-50/90 p-2 md:p-2.5 rounded-xl border border-purple-200 text-purple-950 font-bold text-xs md:text-sm shadow-sm flex-wrap gap-1.5">
+                            <div class="flex items-center gap-1">
+                                <span>⏱️ 倒數時間:</span>
+                                <select id="typing-time-select" class="bg-white border border-purple-300 rounded-lg px-1.5 py-0.5 text-purple-900 font-bold focus:outline-none shadow-sm cursor-pointer">
+                                    <option value="60" selected>1 分鐘</option>
+                                    <option value="180">3 分鐘</option>
+                                    <option value="300">5 分鐘</option>
+                                </select>
+                                <span id="typing-timer" class="font-mono text-purple-700 text-base md:text-lg font-black ml-1">01:00</span>
+                            </div>
+                            <div>⚡ 打字速度: <span id="typing-wpm" class="font-mono text-purple-700 text-base md:text-lg font-black">0</span> <span class="text-[11px] text-purple-800">字/分</span></div>
+                            <div>🎯 準確率: <span id="typing-accuracy" class="font-mono text-purple-700 text-base md:text-lg font-black">100%</span></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div id="typing-target-word" class="font-times text-2xl md:text-4xl lg:text-5xl font-black tracking-widest min-h-[48px] flex justify-center items-center gap-1 flex-wrap bg-amber-50/50 p-2 rounded-xl border-2 border-dashed border-purple-300 whitespace-pre"></div>
+                            <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="" class="font-times w-full text-center text-2xl md:text-3xl font-bold py-2 px-3 bg-white border-2 border-purple-300 focus:border-purple-600 rounded-xl outline-none shadow-inner transition-all">
+                            <div id="typing-enter-hint" class="hidden text-emerald-800 text-xs font-black bg-emerald-100 border border-emerald-300 py-1 px-3 rounded-full inline-block animate-bounce">✨ 正確！請按 Enter 鍵進入下一題 ↵</div>
+                            <div id="caps-lock-warning" class="hidden text-amber-800 text-xs font-bold bg-amber-100/90 border border-amber-300 py-0.5 px-2 rounded-full inline-block">⚠️ 大寫鎖定 (Caps Lock) 已開啟</div>
+                        </div>
+
+                        <!-- 動態生成 QWERTY 電腦鍵盤 -->
+                        <div id="virtual-keyboard-section" class="bg-amber-100/40 p-2 rounded-xl border border-amber-200/60 mt-2">
+                            <div class="text-xs font-extrabold text-amber-900/80 mb-1 flex justify-end items-center px-1">
+                                <button id="toggle-keyboard-btn" type="button" class="ghibli-btn bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-0.5 rounded-lg text-xs font-extrabold border border-amber-300 shadow-sm">👁️ 隱藏指法</button>
+                            </div>
+                            <div id="virtual-keyboard-body" class="space-y-1 max-w-xl mx-auto select-none overflow-x-auto pb-0.5"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="check-answer-btn" class="mt-3 ghibli-btn bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base md:text-lg py-2 px-8 rounded-xl shadow-md border border-emerald-500">
+                    檢查答案
+                </button>
+
+                <!-- 猜中文模式 上一個 / 下一個 按鈕區塊 -->
+                <div id="flashcard-nav-container" class="hidden mt-2 flex justify-center items-center gap-3">
+                    <button id="flashcard-prev-btn" class="ghibli-btn bg-amber-200 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-amber-950 font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1">
+                        ⬅️ 上一個
+                    </button>
+                    <button id="flashcard-next-btn" class="ghibli-btn bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs md:text-sm py-1.5 px-4 rounded-xl border border-emerald-500 shadow-sm flex items-center gap-1">
+                        下一個 ➡️
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-3 space-y-2">
+                <button id="back-to-main-button" class="w-full ghibli-btn bg-stone-300 hover:bg-stone-400 text-slate-800 font-bold text-base md:text-lg py-2.5 rounded-2xl shadow-md border border-stone-400">返回主選單</button>
+            </div>
+        </div>
+    </div>
+
+    </p>
+
+    <script>
+        // DOM Helper
+        const $ = id => document.getElementById(id);
+
+        const mainSection = $('main-section'), practiceSection = $('practice-section'), practiceCard = $('practice-card');
+        const wordInput = $('word-input'), wordInputContainer = $('word-input-container'), toggleEditBtn = $('toggle-edit-btn');
+        const totalWordsBadge = $('total-words-badge'), startRangeInput = $('range-start'), endRangeInput = $('range-end'), rangeExtraInput = $('range-extra');
+        const selectedCountTag = $('selected-count-tag'), selectedWordsList = $('selected-words-list');
+        const progressIndicator = $('progress-indicator'), chineseWord = $('chinese-word'), englishWordContainer = $('english-word-container'), englishWord = $('english-word');
+        const checkAnswerBtn = $('check-answer-btn'), speakEmojiBtn = $('speak-emoji-btn'), backToMainBtn = $('back-to-main-button'), feedbackIndicator = $('feedback-indicator');
+
+        // Modes
+        const spellingModeDiv = $('spelling-mode'), spellingAnswer = $('spelling-answer'), spellingInputText = $('spelling-input-text'), alphabetKeyboard = $('alphabet-keyboard');
+        const jumbleModeDiv = $('jumble-mode'), jumbleAnswer = $('jumble-answer'), jumblePool = $('jumble-pool'), jumbleCapsBtn = $('jumble-caps-btn'), jumbleClearBtn = $('jumble-clear-btn');
+        const speechModeDiv = $('speech-mode'), toggleSpeechEnglishBtn = $('toggle-speech-english-btn'), recordBtn = $('record-btn'), recognitionStatus = $('recognition-status'), recognizedText = $('recognized-text'), speechPrevBtn = $('speech-prev-btn'), speechNextBtn = $('speech-next-btn');
+        const flashcardNavContainer = $('flashcard-nav-container'), flashcardPrevBtn = $('flashcard-prev-btn'), flashcardNextBtn = $('flashcard-next-btn');
+        const typingModeDiv = $('typing-mode'), typingTimeSelect = $('typing-time-select'), typingTimerDisplay = $('typing-timer'), typingWpmDisplay = $('typing-wpm'), typingAccuracyDisplay = $('typing-accuracy'), typingTargetWord = $('typing-target-word'), typingInput = $('typing-input'), typingEnterHint = $('typing-enter-hint'), capsLockWarning = $('caps-lock-warning'), toggleKeyboardBtn = $('toggle-keyboard-btn'), virtualKeyboardBody = $('virtual-keyboard-body');
+
+        // State variables
+        let typingTimerInterval = null, typingRemainingSeconds = 60, typingTotalAllocatedSeconds = 60, typingStartTime = null;
+        let typingTotalTypedChars = 0, typingCorrectTypedChars = 0, isCurrentWordWordCorrect = false;
+        let currentWordIndex = 0, currentMode = '', allParsedWords = [], activeWords = [];
+        let audioCtx = null, isCaps = false, hideSpeechEnglish = false;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null, isRecording = false;
+        const synth = window.speechSynthesis;
+
+        // --- 音效與語音 ---
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now);
+            const isOk = type === 'correct';
+            osc.type = isOk ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(isOk ? 523.25 : 220, now);
+            osc.frequency.exponentialRampToValueAtTime(isOk ? 783.99 : 160, now + 0.15);
+            gain.gain.linearRampToValueAtTime(0.25, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        }
+
+        function speakWord() {
+            if (synth.speaking || !activeWords.length) return;
+            const utter = new SpeechSynthesisUtterance(activeWords[currentWordIndex].english);
+            utter.lang = 'en-US'; utter.rate = 0.9;
+            synth.speak(utter);
+        }
+
+        // --- 鍵盤建立 (拼字與打字) ---
+        function createAlphabetKeyboard() {
+            alphabetKeyboard.innerHTML = '';
+            const qwerty = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m']];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'w-full max-w-xl mx-auto space-y-1 select-none';
+
+            const addChar = char => {
+                const el = document.createElement('span');
+                if (char === ' ') { el.innerHTML = '&nbsp;'; el.className = 'spelling-space'; }
+                else { el.textContent = char; }
+                spellingInputText.appendChild(el);
+            };
+
+            const letterBtns = [];
+            qwerty.forEach(row => {
+                const rDiv = document.createElement('div');
+                rDiv.className = 'flex justify-center gap-1 font-times font-black';
+                row.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'letter-btn ghibli-btn bg-sky-100 hover:bg-sky-200 text-sky-950 font-black text-xl md:text-2xl w-8 md:w-10 h-8 md:h-10 rounded-lg border border-sky-300 shadow-sm flex items-center justify-center font-times';
+                    btn.textContent = c; btn.dataset.char = c;
+                    btn.onclick = () => addChar(btn.textContent);
+                    rDiv.appendChild(btn); letterBtns.push(btn);
+                });
+                wrapper.appendChild(rDiv);
+            });
+
+            const ctrlDiv = document.createElement('div');
+            ctrlDiv.className = 'flex justify-center items-center gap-1 mt-1.5 flex-wrap';
+
+            const capsBtn = document.createElement('button');
+            capsBtn.className = 'ghibli-btn bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs md:text-sm py-1.5 px-2.5 rounded-lg border border-slate-300 shadow-sm';
+            capsBtn.textContent = '大小寫';
+            capsBtn.onclick = () => {
+                isCaps = !isCaps;
+                capsBtn.classList.toggle('bg-sky-300', isCaps);
+                letterBtns.forEach(b => b.textContent = isCaps ? b.dataset.char.toUpperCase() : b.dataset.char.toLowerCase());
+            };
+
+            const spaceBtn = document.createElement('button');
+            spaceBtn.className = 'ghibli-btn bg-indigo-100 hover:bg-indigo-200 text-indigo-950 font-bold text-xs md:text-sm py-1.5 px-5 rounded-lg border border-indigo-300 shadow-sm flex-grow max-w-xs';
+            spaceBtn.textContent = '空白鍵'; spaceBtn.onclick = () => addChar(' ');
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'ghibli-btn bg-sky-200 hover:bg-sky-300 text-sky-950 font-bold text-xs md:text-sm py-1.5 px-2.5 rounded-lg border border-sky-300 shadow-sm';
+            backBtn.innerHTML = '&larr; 刪除';
+            backBtn.onclick = () => { if (spellingInputText.lastChild) spellingInputText.removeChild(spellingInputText.lastChild); };
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'ghibli-btn bg-rose-100 hover:bg-rose-200 text-rose-900 font-bold text-xs md:text-sm py-1.5 px-2.5 rounded-lg border border-rose-300 shadow-sm';
+            clearBtn.textContent = '清除'; clearBtn.onclick = () => spellingInputText.innerHTML = '';
+
+            ctrlDiv.append(capsBtn, spaceBtn, backBtn, clearBtn);
+            wrapper.appendChild(ctrlDiv);
+            alphabetKeyboard.appendChild(wrapper);
+        }
+
+        // 動態生成打字模式 QWERTY 指法鍵盤
+        function createTypingKeyboard() {
+            virtualKeyboardBody.innerHTML = '';
+            const keyColors = {
+                q:'rose',a:'rose',z:'rose', w:'orange',s:'orange',x:'orange', e:'yellow',d:'yellow',c:'yellow',
+                r:'emerald',f:'emerald',v:'emerald',t:'emerald',g:'emerald',b:'emerald',
+                y:'sky',h:'sky',n:'sky',u:'sky',j:'sky',m:'sky', i:'indigo',k:'indigo', o:'pink',l:'pink'
+            };
+
+            const rows = [
+                [{k:'Tab',w:'w-7 md:w-9',s:'bg-slate-200 text-slate-500 text-[10px]'}, ...'qwertyuiop'.split('').map(c=>({k:c})), {k:'⌫',w:'w-7 md:w-9',s:'bg-slate-200 text-slate-500 text-[10px]'}],
+                [{k:'Caps',w:'w-9 md:w-11',s:'bg-slate-200 text-slate-500 text-[10px]'}, ...'asdfghjkl'.split('').map(c=>({k:c})), {k:'Enter',w:'w-9 md:w-11',s:'bg-slate-200 text-slate-500 text-[10px]'}],
+                [{k:'Shift',id:'vkey-shift-l',w:'w-11 md:w-13',s:'bg-slate-200 text-slate-500 text-[10px]'}, ...'zxcvbnm'.split('').map(c=>({k:c})), {k:'Shift',id:'vkey-shift-r',w:'w-11 md:w-13',s:'bg-slate-200 text-slate-500 text-[10px]'}],
+                [{k:'Space (空白鍵)',id:'vkey-space',w:'w-36 md:w-48',s:'bg-amber-200 text-amber-950 border-amber-300 text-xs'}]
+            ];
+
+            rows.forEach(row => {
+                const rDiv = document.createElement('div');
+                rDiv.className = 'flex justify-center gap-1 text-xs md:text-base font-black';
+                row.forEach(item => {
+                    const kDiv = document.createElement('div');
+                    const color = keyColors[item.k] || 'slate';
+                    const keyId = item.id || (item.k.length === 1 ? `vkey-${item.k}` : '');
+                    if (keyId) kDiv.id = keyId;
+                    
+                    const width = item.w || 'w-6 md:w-8';
+                    const style = item.s || `bg-${color}-200 text-${color}-950 border-${color}-300 font-times`;
+                    kDiv.className = `keyboard-key ${width} h-7 md:h-8 rounded-md flex items-center justify-center border ${style}`;
+                    kDiv.textContent = item.k;
+                    rDiv.appendChild(kDiv);
+                });
+                virtualKeyboardBody.appendChild(rDiv);
+            });
+        }
+
+        // --- 資料處理與選取範圍 ---
+        function processWords(text) {
+            return text.trim().split('\n').map(line => {
+                const p = line.trim().split(/,|\t|，/).map(s => s.trim());
+                if (p.length < 2 || !p[0] || !p[1]) return null;
+                const hasEng = s => /[a-zA-Z]/.test(s);
+                return hasEng(p[0]) ? { english: p[0], chinese: p[1] } : { english: p[1], chinese: p[0] };
+            }).filter(Boolean);
+        }
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function getSelectedWordsWithIndices() {
+            if (!allParsedWords.length) return [];
+            let s = Math.max(1, parseInt(startRangeInput.value) || 1);
+            let e = Math.min(allParsedWords.length, parseInt(endRangeInput.value) || allParsedWords.length);
+            if (s > e) [s, e] = [e, s];
+            
+            const idxs = new Set();
+            for (let i = s - 1; i < e; i++) idxs.add(i);
+            
+            if (rangeExtraInput.value.trim()) {
+                rangeExtraInput.value.trim().split(/[\s,，]+/).forEach(t => {
+                    const idx = parseInt(t) - 1;
+                    if (!isNaN(idx) && idx >= 0 && idx < allParsedWords.length) idxs.add(idx);
+                });
+            }
+            return [...idxs].sort((a,b)=>a-b).map(i => ({ index: i + 1, word: allParsedWords[i] }));
+        }
+
+        function updateWordStatsAndRanges() {
+            allParsedWords = processWords(wordInput.value || '');
+            const total = allParsedWords.length;
+            totalWordsBadge.textContent = `共 ${total} 個單字`;
+            startRangeInput.max = total || 1; endRangeInput.max = total || 1;
+
+            if (total > 0) {
+                if (!startRangeInput.value) startRangeInput.value = 1;
+                if (!endRangeInput.value) endRangeInput.value = total;
+            } else { startRangeInput.value = 0; endRangeInput.value = 0; }
+
+            renderSelectedWordsPreview();
+        }
+
+        function renderSelectedWordsPreview() {
+            const items = getSelectedWordsWithIndices();
+            selectedCountTag.textContent = `已選 ${items.length} 個`;
+            selectedWordsList.innerHTML = items.length ? '' : `<p class="col-span-full text-center text-slate-400 py-4 font-bold">目前範圍內無單字</p>`;
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/80 border border-emerald-200/60 p-2.5 rounded-xl flex items-center justify-start gap-2 shadow-sm min-w-0';
+                card.innerHTML = `
+                    <span class="bg-sky-200 text-sky-900 font-black text-xs px-2 py-0.5 rounded-md shrink-0 border border-sky-300">${item.index}</span>
+                    <span class="font-black text-emerald-950 text-xl md:text-2xl truncate shrink-0 max-w-[45%] font-times">${item.word.english}</span>
+                    <span class="text-slate-600 text-sm md:text-base font-bold truncate">${item.word.chinese}</span>
+                `;
+                selectedWordsList.appendChild(card);
+            });
+        }
+
+        // --- 練習模式 logic ---
+        function showSection(name) {
+            mainSection.classList.toggle('hidden', name !== 'main');
+            practiceSection.classList.toggle('hidden', name !== 'practice');
+        }
+
+        function displayWord() {
+            const cur = activeWords[currentWordIndex];
+            progressIndicator.textContent = `單字 ${currentWordIndex + 1} / ${activeWords.length}`;
+            
+            if (recognition && isRecording) { try { recognition.stop(); } catch(e){} }
+
+            chineseWord.textContent = currentMode === 'flashcard_en2zh' ? cur.english : cur.chinese;
+            chineseWord.className = currentMode === 'flashcard_en2zh' ? 'drop-shadow-sm font-times text-blue-900 font-black' : 'drop-shadow-sm';
+            
+            englishWord.textContent = currentMode === 'flashcard_en2zh' ? cur.chinese : cur.english;
+            englishWord.className = currentMode === 'flashcard_en2zh' 
+                ? 'text-5xl md:text-7xl font-black text-black drop-shadow-sm mt-2' 
+                : (currentMode === 'speech' 
+                    ? 'text-4xl md:text-6xl font-black text-emerald-700 drop-shadow-sm font-times mt-2' 
+                    : 'text-5xl md:text-7xl font-black text-emerald-700 drop-shadow-sm font-times');
+
+            feedbackIndicator.textContent = '';
+            englishWordContainer.classList.add('hidden');
+            checkAnswerBtn.disabled = false;
+
+            if (currentMode === 'spelling') {
+                spellingInputText.innerHTML = '';
+                alphabetKeyboard.classList.remove('opacity-50', 'pointer-events-none');
+            } else if (currentMode === 'flashcard_en2zh') {
+                if (flashcardPrevBtn) flashcardPrevBtn.disabled = (currentWordIndex === 0);
+                if (flashcardNextBtn) flashcardNextBtn.disabled = (currentWordIndex === activeWords.length - 1);
+            } else if (currentMode === 'jumble') {
+                jumbleAnswer.innerHTML = ''; jumblePool.innerHTML = '';
+                shuffleArray(cur.english.split('')).forEach(letter => {
+                    const btn = document.createElement('button');
+                    const isSpace = letter === ' ';
+                    btn.className = isSpace 
+                        ? 'letter-btn ghibli-btn bg-amber-300 hover:bg-amber-400 border-2 border-amber-500 shadow-sm w-10 md:w-12 h-11 md:h-14 rounded-xl'
+                        : 'letter-btn ghibli-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-black text-2xl md:text-3xl py-2.5 px-4 rounded-xl border border-emerald-300 shadow-sm font-times';
+                    btn.textContent = isSpace ? '' : (isCaps ? letter.toUpperCase() : letter);
+                    btn.dataset.char = letter;
+                    btn.onclick = () => {
+                        (btn.parentElement === jumblePool ? jumbleAnswer : jumblePool).appendChild(btn);
+                        checkJumbleAutoAnswer();
+                    };
+                    jumblePool.appendChild(btn);
+                });
+                jumbleCapsBtn.classList.toggle('bg-amber-300', isCaps);
+            } else if (currentMode === 'speech') {
+                updateSpeechEnglishVisibility();
+                recognizedText.textContent = '';
+                recognitionStatus.textContent = '點擊麥克風開始';
+                recordBtn.disabled = false;
+                if (speechPrevBtn) speechPrevBtn.disabled = (currentWordIndex === 0);
+                if (speechNextBtn) speechNextBtn.disabled = (currentWordIndex === activeWords.length - 1);
+            } else if (currentMode === 'typing') {
+                typingInput.value = ''; isCurrentWordWordCorrect = false;
+                typingEnterHint.classList.add('hidden');
+                renderTypingTarget();
+                setTimeout(() => typingInput.focus(), 100);
+            }
+        }
+
+        function checkJumbleAutoAnswer() {
+            const userAnswer = Array.from(jumbleAnswer.children).map(b => b.dataset.char).join('');
+            if (userAnswer === activeWords[currentWordIndex].english) {
+                playSound('correct');
+                feedbackIndicator.textContent = '🌸';
+                englishWordContainer.classList.remove('hidden');
+                jumblePool.innerHTML = '';
+
+                setTimeout(() => {
+                    if (currentWordIndex < activeWords.length - 1) {
+                        currentWordIndex++; displayWord();
+                    } else {
+                        feedbackIndicator.textContent = '🏆';
+                        setTimeout(() => { alert('🎉 恭喜！您已完成所有單字的字母重組練習！'); showSection('main'); }, 300);
+                    }
+                }, 800);
+            }
+        }
+
+        function checkAnswer() {
+            if (currentMode === 'flashcard_en2zh') {
+                englishWordContainer.classList.remove('hidden');
+                checkAnswerBtn.disabled = true;
+                return;
+            }
+            let isCorrect = false;
+            const correctEng = activeWords[currentWordIndex].english.toLowerCase();
+            if (currentMode === 'spelling') {
+                const userVal = Array.from(spellingInputText.children).map(n => n.classList.contains('spelling-space') ? ' ' : n.textContent).join('');
+                isCorrect = userVal.toLowerCase() === correctEng;
+            }
+
+            playSound(isCorrect ? 'correct' : 'incorrect');
+            feedbackIndicator.textContent = isCorrect ? '🌸' : '🍂';
+
+            if (isCorrect) {
+                englishWordContainer.classList.remove('hidden');
+                checkAnswerBtn.disabled = true;
+                if (currentMode === 'spelling') alphabetKeyboard.classList.add('opacity-50', 'pointer-events-none');
+            } else if (currentMode === 'spelling') {
+                spellingAnswer.classList.add('animate-shake');
+                setTimeout(() => spellingAnswer.classList.remove('animate-shake'), 500);
+            }
+        }
+
+        // --- 語音辨識 ---
+        function initSpeechRecognition() {
+            if (!SpeechRecognition) {
+                const btn = document.querySelector('button[data-mode="speech"]');
+                if (btn) { btn.disabled = true; btn.textContent = '不支援語音辨識'; btn.classList.add('opacity-50', 'cursor-not-allowed'); }
+                return;
+            }
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.onstart = () => { isRecording = true; recordBtn.classList.add('recording'); recognitionStatus.textContent = '正在聆聽...'; };
+            recognition.onresult = e => handleRecognitionResult(e.results[0][0].transcript);
+            recognition.onerror = e => recognitionStatus.textContent = e.error === 'no-speech' ? '聽不到聲音，請再試一次' : `請重試 (${e.error})`;
+            recognition.onend = () => {
+                isRecording = false; recordBtn.classList.remove('recording');
+                if (recognitionStatus.textContent === '正在聆聽...') recognitionStatus.textContent = '點擊麥克風開始';
+            };
+        }
+
+        function handleRecognitionResult(transcript) {
+            recognizedText.textContent = `「${transcript}」`;
+            const clean = s => s.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+            const isCorrect = clean(transcript) === clean(activeWords[currentWordIndex].english);
+
+            playSound(isCorrect ? 'correct' : 'incorrect');
+            feedbackIndicator.textContent = isCorrect ? '🌸' : '🍂';
+            if (isCorrect) { recordBtn.disabled = true; englishWordContainer.classList.remove('hidden'); }
+            else { recognitionStatus.textContent = '再試一次看看喔！'; }
+        }
+
+        function updateSpeechEnglishVisibility() {
+            englishWordContainer.classList.toggle('hidden', hideSpeechEnglish);
+            toggleSpeechEnglishBtn.textContent = hideSpeechEnglish ? '👁️ 顯示英文' : '👁️ 隱藏英文';
+        }
+
+        // --- 打字練習邏輯 ---
+        function resetTypingStats() {
+            clearInterval(typingTimerInterval); typingTimerInterval = null;
+            typingTotalAllocatedSeconds = parseInt(typingTimeSelect.value) || 60;
+            typingRemainingSeconds = typingTotalAllocatedSeconds;
+            typingStartTime = null; typingTotalTypedChars = 0; typingCorrectTypedChars = 0; isCurrentWordWordCorrect = false;
+
+            const m = String(Math.floor(typingRemainingSeconds / 60)).padStart(2, '0');
+            const s = String(typingRemainingSeconds % 60).padStart(2, '0');
+            typingTimerDisplay.textContent = `${m}:${s}`;
+            typingWpmDisplay.textContent = '0';
+            typingAccuracyDisplay.textContent = '100%';
+            typingInput.disabled = false; typingInput.value = '';
+            typingEnterHint.classList.add('hidden');
+        }
+
+        function startTypingTimer() {
+            if (typingTimerInterval) return;
+            typingStartTime = Date.now();
+            typingTimerInterval = setInterval(() => {
+                typingRemainingSeconds--;
+                const m = String(Math.floor(typingRemainingSeconds / 60)).padStart(2, '0');
+                const s = String(typingRemainingSeconds % 60).padStart(2, '0');
+                typingTimerDisplay.textContent = `${m}:${s}`;
+
+                const elapsed = (typingTotalAllocatedSeconds - typingRemainingSeconds) / 60;
+                if (elapsed > 0) typingWpmDisplay.textContent = Math.max(0, Math.round((typingCorrectTypedChars / 5) / elapsed));
+
+                if (typingRemainingSeconds <= 0) {
+                    clearInterval(typingTimerInterval); typingTimerInterval = null; typingInput.disabled = true;
+                    alert(`⏱️ 時間到！\n打字速度：${typingWpmDisplay.textContent} WPM\n正確率：${typingAccuracyDisplay.textContent}`);
+                }
+            }, 1000);
+        }
+
+        function renderTypingTarget() {
+            const target = activeWords[currentWordIndex].english;
+            const inputVal = typingInput.value;
+            typingTargetWord.innerHTML = '';
+            
+            let allMatch = true, nextChar = '';
+            for (let i = 0; i < target.length; i++) {
+                const span = document.createElement('span');
+                const c = target[i];
+                if (i < inputVal.length) {
+                    if (inputVal[i] === c) { span.className = 'text-emerald-600 font-black'; }
+                    else { span.className = 'text-rose-500 bg-rose-100 rounded px-0.5 font-black'; allMatch = false; }
+                } else if (i === inputVal.length) {
+                    span.className = 'text-purple-700 bg-purple-200/80 rounded px-1 font-black animate-pulse';
+                    if (allMatch) nextChar = c;
+                } else { span.className = 'text-slate-400 font-bold'; }
+                span.textContent = c;
+                typingTargetWord.appendChild(span);
+            }
+            highlightVirtualKeyboardKey(nextChar);
+        }
+
+        function handleTypingInput(e) {
+            if (!typingStartTime && typingRemainingSeconds > 0) startTypingTimer();
+            const target = activeWords[currentWordIndex].english;
+            const inputVal = typingInput.value;
+
+            typingTotalTypedChars++;
+            if (e.inputType !== 'deleteContentBackward' && inputVal.length > 0 && inputVal.slice(-1) === target[inputVal.length - 1]) {
+                typingCorrectTypedChars++;
+            }
+
+            if (typingTotalTypedChars > 0) {
+                const acc = Math.round((typingCorrectTypedChars / typingTotalTypedChars) * 100);
+                typingAccuracyDisplay.textContent = `${Math.max(0, Math.min(100, acc))}%`;
+            }
+
+            renderTypingTarget();
+
+            if (inputVal === target) {
+                if (!isCurrentWordWordCorrect) {
+                    isCurrentWordWordCorrect = true;
+                    playSound('correct');
+                    feedbackIndicator.textContent = '🌸';
+                    typingEnterHint.classList.remove('hidden');
+                }
+            } else {
+                isCurrentWordWordCorrect = false;
+                typingEnterHint.classList.add('hidden');
+            }
+        }
+
+        function highlightVirtualKeyboardKey(char) {
+            document.querySelectorAll('.keyboard-key').forEach(k => k.classList.remove('key-active'));
+            if (!char) return;
+
+            const lower = char.toLowerCase();
+            const keyId = lower === ' ' ? 'vkey-space' : (/[a-z]/.test(lower) ? `vkey-${lower}` : '');
+            if (keyId && $(keyId)) $(keyId).classList.add('key-active');
+
+            if (/[A-Z]/.test(char)) {
+                if ($('vkey-shift-l')) $('vkey-shift-l').classList.add('key-active');
+                if ($('vkey-shift-r')) $('vkey-shift-r').classList.add('key-active');
+            }
+        }
+
+        function advanceTypingWord() {
+            if (currentWordIndex < activeWords.length - 1) {
+                currentWordIndex++; displayWord();
+            } else {
+                clearInterval(typingTimerInterval);
+                feedbackIndicator.textContent = '🏆';
+                alert(`🎉 恭喜完成！\n打字速度：${typingWpmDisplay.textContent} WPM\n正確率：${typingAccuracyDisplay.textContent}`);
+                showSection('main');
+            }
+        }
+
+        function startPractice(mode) {
+            initAudio();
+            const selectedWords = getSelectedWordsWithIndices().map(i => i.word);
+            if (!selectedWords.length) { alert('請先選擇或輸入有效的單字！'); return; }
+
+            currentMode = mode;
+            activeWords = shuffleArray(selectedWords);
+            currentWordIndex = 0;
+
+            if (practiceCard) {
+                if (mode === 'flashcard_en2zh') {
+                    practiceCard.className = "relative rounded-3xl p-6 md:p-8 h-[320px] md:h-[360px] flex flex-col items-center justify-between border-2 bg-amber-100/90 border-amber-300/80 shadow-lg shadow-amber-900/10 transition-colors duration-300";
+                } else if (mode === 'spelling') {
+                    practiceCard.className = "relative rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 bg-sky-50/90 border-sky-300/80 shadow-lg shadow-sky-900/10 transition-colors duration-300";
+                } else {
+                    practiceCard.className = "relative ghibli-card rounded-3xl p-4 md:p-6 min-h-0 flex flex-col items-center justify-between border-2 border-emerald-200/80 transition-colors duration-300";
+                }
+            }
+
+            [spellingModeDiv, jumbleModeDiv, speechModeDiv, typingModeDiv, checkAnswerBtn, flashcardNavContainer].forEach(el => el.classList.add('hidden'));
+            if (mode === 'spelling') { spellingModeDiv.classList.remove('hidden'); checkAnswerBtn.classList.remove('hidden'); }
+            else if (mode === 'jumble') { jumbleModeDiv.classList.remove('hidden'); }
+            else if (mode === 'speech') { speechModeDiv.classList.remove('hidden'); }
+            else if (mode === 'typing') { typingModeDiv.classList.remove('hidden'); resetTypingStats(); }
+            else if (mode === 'flashcard_en2zh') { checkAnswerBtn.classList.remove('hidden'); flashcardNavContainer.classList.remove('hidden'); }
+
+            showSection('practice'); displayWord();
+        }
+
+        // Event listeners
+        recordBtn.addEventListener('click', () => {
+            initAudio();
+            if (isRecording) { try { recognition.stop(); } catch(e){} }
+            else if (recognition) { try { recognition.start(); } catch(e){} }
+        });
+
+        toggleEditBtn.addEventListener('click', () => {
+            wordInputContainer.classList.toggle('hidden');
+            toggleEditBtn.textContent = wordInputContainer.classList.contains('hidden') ? '✏️ 編輯單字庫' : '📁 隱藏編輯器';
+        });
+
+        toggleSpeechEnglishBtn.addEventListener('click', () => { hideSpeechEnglish = !hideSpeechEnglish; updateSpeechEnglishVisibility(); });
+        speechPrevBtn.addEventListener('click', () => { if (currentWordIndex > 0) { currentWordIndex--; displayWord(); } });
+        speechNextBtn.addEventListener('click', () => { if (currentWordIndex < activeWords.length - 1) { currentWordIndex++; displayWord(); } });
+
+        flashcardPrevBtn.addEventListener('click', () => { if (currentWordIndex > 0) { currentWordIndex--; displayWord(); } });
+        flashcardNextBtn.addEventListener('click', () => { if (currentWordIndex < activeWords.length - 1) { currentWordIndex++; displayWord(); } });
+
+        wordInput.addEventListener('input', updateWordStatsAndRanges);
+        startRangeInput.addEventListener('input', renderSelectedWordsPreview);
+        endRangeInput.addEventListener('input', renderSelectedWordsPreview);
+        rangeExtraInput.addEventListener('input', renderSelectedWordsPreview);
+        $('btn-apply-range').addEventListener('click', renderSelectedWordsPreview);
+
+        jumbleCapsBtn.addEventListener('click', () => {
+            isCaps = !isCaps; jumbleCapsBtn.classList.toggle('bg-amber-300', isCaps);
+            document.querySelectorAll('#jumble-pool .letter-btn, #jumble-answer .letter-btn').forEach(b => {
+                if (b.dataset.char && b.dataset.char !== ' ') b.textContent = isCaps ? b.dataset.char.toUpperCase() : b.dataset.char.toLowerCase();
+            });
+        });
+
+        jumbleClearBtn.addEventListener('click', () => {
+            Array.from(jumbleAnswer.children).forEach(b => jumblePool.appendChild(b));
+            feedbackIndicator.textContent = '';
+        });
+
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => startPractice(btn.dataset.mode)));
+        typingTimeSelect.addEventListener('change', resetTypingStats);
+        typingInput.addEventListener('input', handleTypingInput);
+        typingInput.addEventListener('keydown', e => { if (e.key === 'Enter' && isCurrentWordWordCorrect) { e.preventDefault(); advanceTypingWord(); } });
+
+        toggleKeyboardBtn.addEventListener('click', () => {
+            virtualKeyboardBody.classList.toggle('hidden');
+            toggleKeyboardBtn.textContent = virtualKeyboardBody.classList.contains('hidden') ? '👁️ 顯示指法' : '👁️ 隱藏指法';
+        });
+
+        window.addEventListener('keydown', e => {
+            if (currentMode === 'spelling') {
+                if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    if (spellingInputText.lastChild) spellingInputText.removeChild(spellingInputText.lastChild);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault(); checkAnswer();
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    const el = document.createElement('span'); el.innerHTML = '&nbsp;'; el.className = 'spelling-space'; spellingInputText.appendChild(el);
+                } else if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+                    e.preventDefault();
+                    const el = document.createElement('span'); el.textContent = e.key; spellingInputText.appendChild(el);
+                }
+            } else if (currentMode === 'typing') {
+                capsLockWarning.classList.toggle('hidden', !(e.getModifierState && e.getModifierState('CapsLock')));
+            }
+        });
+
+        checkAnswerBtn.addEventListener('click', checkAnswer);
+        speakEmojiBtn.addEventListener('click', speakWord);
+        backToMainBtn.addEventListener('click', () => { clearInterval(typingTimerInterval); showSection('main'); });
+
+        window.addEventListener('load', () => {
+            showSection('main');
+            createAlphabetKeyboard();
+            createTypingKeyboard();
+            initSpeechRecognition();
+            updateWordStatsAndRanges();
+        });
+    </script>
+</body>
+</html>
